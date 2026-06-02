@@ -1,0 +1,340 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 59
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b323f7d7-2637-4914-a03e-fbc1b239bb01",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        16
+      ],
+      "id": "21e897a2-7e53-4a1e-a9e0-0ed52c51ceea",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const top5 = $input.all().slice(0, 5);\n\nreturn top5.map(item => ({\n  json: {\n    name: item.json.name,\n    symbol: item.json.symbol,\n    current_price: item.json.current_price,\n    market_cap_rank: item.json.market_cap_rank,\n    price_change_percentage_24h: item.json.price_change_percentage_24h\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        16
+      ],
+      "id": "c554460f-6f52-4177-ba0e-dff0b22a12ab",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://api.coingecko.com/api/v3/coins/bitcoin",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -432,
+        32
+      ],
+      "id": "e5dfadf6-8eca-48be-959e-b19510a7d154",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        496,
+        -96
+      ],
+      "id": "0a472843-1292-45d9-a902-4b5c32aedf3b",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fbb5e072-48a7-4b20-89bc-7600711610df",
+              "leftValue": "={{$json.market_data.price_change_percentage_24h}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -160,
+        -96
+      ],
+      "id": "90766acf-a266-45a1-a250-a3edf99d689c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0add1a9d-efbb-4562-8cdc-5ee59ef6fe4e",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        -224
+      ],
+      "id": "53c57066-9bf6-45e6-b94a-c2c371dff40e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": " https://webhook.site/965562d7-8e4e-4994-9125-a297626ab843",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"coin\": \"{{$json.name}}\",\n  \"symbol\": \"{{$json.symbol}}\",\n  \"rank\": \"{{$json.market_cap_rank}}\",\n  \"status\": \"Market Down\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        651,
+        -128
+      ],
+      "id": "f8320bf6-50d2-4a5d-8b92-ae5fac3bd2ad",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9d3c1275-26de-420e-8b15-227b2426ddc4",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        112
+      ],
+      "id": "38148286-4c4b-4b02-a028-b8a86f047fbe",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e78a7b3e-9fc7-4e6e-a5e5-e90ecb1eee53",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        -144
+      ],
+      "id": "226bc520-9964-40f5-9ab1-af159a88cac5",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/965562d7-8e4e-4994-9125-a297626ab843",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"coin\": \"{{$json.name}}\",\n  \"symbol\": \"{{$json.symbol}}\",\n  \"rank\": \"{{$json.market_cap_rank}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        144
+      ],
+      "id": "30b6530a-6d47-4677-91b5-0dddcdab5e9b",
+      "name": "HTTP Request4",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a9fae351-afb0-4cf2-8c83-69b795ed3dd9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1edd2174ed3cc24759279b0b4192aa431550816e09a51f019d11d5d67c645f96"
+  },
+  "id": "KIoxIflAT40sXY4H",
+  "tags": []
+}
