@@ -1,7 +1,6 @@
 # n8n Assignment Submission
 
-## GitHub Repository
-https://github.com/your-username/your-repo-name
+
 
 ---
 
